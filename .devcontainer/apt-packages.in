@@ -3,6 +3,8 @@ curl
 locales
 sudo
 tzdata
+ssh
+git
 
 gcc
 clang
