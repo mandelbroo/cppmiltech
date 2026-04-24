@@ -42,6 +42,11 @@ jobs:
       - name: Build inside dev container
         uses: devcontainers/ci@v0.3
         with:
+          # push: never - не публікувати built image ніде. За замовчуванням
+          # action пробує push у registry і падає з "imageName is required"
+          # бо ми не конфігуруємо registry. Image потрібен тільки локально
+          # на runner-і для runCmd.
+          push: never
           runCmd: |
             cmake -S . -B build -G Ninja
             cmake --build build
