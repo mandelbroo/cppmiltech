@@ -57,19 +57,26 @@ formal review (approve / request changes) навіть на публічному
 
 ## Оновлення з курс-репо
 
-Якщо у курс-репо з'являється щось нове (новий starter, фікс у devcontainer,
-оновлена інструкція) - підтягти у свій репо можна через додатковий remote:
+Зміни в курс-репо не синкаються автоматично у локальний репо. Якщо
+щось важливе оновлюється - буде анонс у Slack-каналі курсу з
+інструкцією, що замінити вручну.
 
-```bash
-# одноразово: додати курс-репо як remote `course`
-git remote add course https://github.com/robot-dreams-code/C-PLUS-PLUS-FOR-MILITARY-TECHNOLOGY.git
+**Чому не git merge / cherry-pick:** курс-репо позначений як GitHub
+Template. Копія через "Use this template" - це новий репо з єдиним
+"Initial commit", без зв'язку з курс-репо в історії. Спільного предка
+нема, тому git нічого не може злити автоматично.
 
-# коли треба оновитись:
-git fetch course
-git merge course/main              # підтягнути все
-# або точково:
-git cherry-pick <commit-sha>       # конкретний коміт
-```
+Чому Template, а не fork: fork залишає історію спільною, і merge для
+нього працював би. Але PR на fork-у GitHub дефолтно цілить у upstream
+(у курс-репо). Курс-репо має лишатися read-only, PR-и студентів - іти
+у їхні репо. Template це знімає, ціна - нема прямого git-sync.
+
+`git merge course/main` падає з `refusing to merge unrelated histories`.
+З `--allow-unrelated-histories` merge пройде, але вийде каша: дві
+кореневі коміти і конфлікти на більшості файлів. Cherry-pick не падає
+сам, але конфліктує на локально модифікованих файлах.
+
+Простіше - ручна заміна файлів за Slack-анонсом. Без git-акробатики.
 
 ## Перед стартом
 
