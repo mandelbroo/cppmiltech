@@ -4,41 +4,29 @@
 
 using namespace std;
 
-ifstream readFile(const char* filePath) {
-  ifstream file(filePath, ios::in);
-
-  if (!file.is_open()) {
-    cerr << "Error: Could not open the file:" << filePath << endl;
-    exit(1);
-  }
-
-  return file;
-}
-
 int main(int argc, char** argv) {
   if (argc != 2) {
     cerr << "usage: ugv_odometry <input_path>" << endl;
     return 1;
   }
 
-  cout << "processing file: " << argv[1] << endl;
-
-  ifstream file = readFile(argv[1]);
-  string line;
-
-  float timestamp_ms;
-  float fl_ticks;
-  float fr_ticks;
-  float bl_ticks;
-  float br_ticks;
+  ifstream file(argv[1], ios::in);
 
   if (!file.is_open()) {
     cerr << "Error: Could not open the file:" << argv[1] << endl;
     return 1;
   }
 
-  while (std::getline(file, line)) {
-    getline(file, line);
+  float x = 0, y = 0, theta = 0;
+  float timestamp_ms;
+  float fl_ticks;
+  float fr_ticks;
+  float bl_ticks;
+  float br_ticks;
+
+  string line;
+
+  while (getline(file, line)) {
     istringstream ss(line);
     ss >> timestamp_ms >> fl_ticks >> fr_ticks >> bl_ticks >> br_ticks;
 
