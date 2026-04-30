@@ -38,9 +38,9 @@ git pull
 Всередині контейнера (VS Code terminal):
 
 ```bash
-cmake -S . -B build -G Ninja
-cmake --build build
-./build/homework_04/ugv_odometry homework_04/data/straight.txt
+cmake --preset debug
+cmake --build --preset debug
+./build/debug/homework_04/ugv_odometry homework_04/data/straight.txt
 ```
 
 Перші дві команди мають завершитись без помилки. Остання команда запускає
