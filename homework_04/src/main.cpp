@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
     float d_bl = bl_ticks - prev_bl_ticks;
     float d_br = br_ticks - prev_br_ticks;
 
-    // Крок 2. Усереднити борти (передне i заднє колесо одного боку обертаються синхронно):
+    // Крок 2. Усереднити борти (переднє i заднє колесо одного боку обертаються синхронно):
     float d_left = (d_fl + d_bl) / 2.0;
     float d_right = (d_fr + d_br) / 2.0;
 
