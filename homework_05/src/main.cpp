@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
     const int frame_count = read_frames(argv[1], frames, MAX_TELEMETRY_FRAMES);
 
     if (frame_count == -1) {
-        return 0;
+        return -1;
     }
 
     const Summary summary = summarize(frames, frame_count);
