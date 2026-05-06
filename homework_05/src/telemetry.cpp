@@ -43,7 +43,7 @@ long parse_long(const char* text) {
     const long value = std::strtol(text, &end, 10);
 
     if (end == text) {
-        std::abort();
+        throw std::invalid_argument("invalid long value: \"" + std::string(text) + '"');
     }
 
     return value;
@@ -58,7 +58,7 @@ double parse_double(const char* text) {
     const double value = std::strtod(text, &end);
 
     if (end == text) {
-        std::abort();
+        throw std::invalid_argument("invalid double value: \"" + std::string(text) + '"');
     }
 
     return value;
@@ -80,13 +80,19 @@ Frame parse_frame(char line[], int frame_index) {
         }
     }
 
-    frame.timestamp_ms = parse_long(fields[0]);
-    frame.seq = parse_int(fields[1]);
-    frame.voltage_v = parse_double(fields[2]);
-    frame.current_a = parse_double(fields[3]);
-    frame.temperature_c = parse_double(fields[4]);
-    frame.gps_fix = parse_int(fields[5]);
-    frame.satellites = parse_int(fields[6]);
+    try {
+        frame.timestamp_ms = parse_long(fields[0]);
+        frame.seq = parse_int(fields[1]);
+        frame.voltage_v = parse_double(fields[2]);
+        frame.current_a = parse_double(fields[3]);
+        frame.temperature_c = parse_double(fields[4]);
+        frame.gps_fix = parse_int(fields[5]);
+        frame.satellites = parse_int(fields[6]);
+    } catch (const std::invalid_argument& e) {
+        std::cerr << "error: " << e.what() << " in frame " << frame_index + 1 << '\n';
+        frame.error = true;
+    }
+    
     return frame;
 }
 
