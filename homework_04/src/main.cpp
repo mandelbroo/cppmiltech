@@ -25,13 +25,6 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  fstream outputFile(OUTPUT_FILE_PATH, ios::out);
-
-  if (!outputFile.is_open()) {
-    cerr << "Error: Could not open the output file:" << OUTPUT_FILE_PATH << endl;
-    return 1;
-  }
-
   int timestamp_ms;
   bool isFirstStep = true;
   float x = 0, y = 0, theta = 0;
@@ -49,7 +42,6 @@ int main(int argc, char** argv) {
       prev_fr_ticks = fr_ticks;
       prev_bl_ticks = bl_ticks;
       prev_br_ticks = br_ticks;
-      outputFile << timestamp_ms << " " << x << " " << y << " " << theta << endl;
 
       continue;  // Пропускаємо перший елемент оскільки нам потрібні два елементи для обчислення дельти
     }
@@ -82,13 +74,10 @@ int main(int argc, char** argv) {
     prev_fr_ticks = fr_ticks;
     prev_bl_ticks = bl_ticks;
     prev_br_ticks = br_ticks;
-    outputFile << timestamp_ms << " " << x << " " << y << " " << theta << endl;
+    cout << timestamp_ms << " " << x << " " << y << " " << theta << endl;
   }
 
   inputFile.close();
-  outputFile.close();
-
-  cout << "Odometry calculation completed. Output written to: " << OUTPUT_FILE_PATH << endl;
 
   return 0;
 }
