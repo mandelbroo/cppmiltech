@@ -11,6 +11,7 @@
 
 const int EXPECTED_FIELD_COUNT = 7;
 const int MAX_LINE_LENGTH = 256;
+const int TEMP_RANGE[] = {-40, 120};
 
 int split_line(char line[], char* fields[], int max_fields) {
     int count = 0;
@@ -73,7 +74,7 @@ Frame parse_frame(char line[], int frame_index) {
 
     for (int i = 0; i < EXPECTED_FIELD_COUNT; ++i) {
         if (fields[i] == nullptr) {
-            std::cerr << "error: missing field " << i + 1 << " in frame " << frame_index + 1 << '\n';
+            std::cerr << "error: invalid frame at line " << frame_index + 1 << ": missing field " << std::endl;
             frame.error = true;
 
             return frame;
@@ -89,7 +90,7 @@ Frame parse_frame(char line[], int frame_index) {
         frame.gps_fix = parse_int(fields[5]);
         frame.satellites = parse_int(fields[6]);
     } catch (const std::invalid_argument& e) {
-        std::cerr << "error: " << e.what() << " in frame " << frame_index + 1 << '\n';
+        std::cerr << "error: invalid frame " << frame_index + 1 << ": " << e.what() << std::endl;
         frame.error = true;
     }
     
@@ -119,6 +120,51 @@ int read_frames(const char* path, Frame frames[], int max_frames) {
 
         if (frame_count < max_frames) {
             frames[frame_count] = parse_frame(line, frame_count);
+            if (frame_count > 0) {
+                if (frames[frame_count].seq != frames[frame_count - 1].seq + 1) {
+                    std::cerr << "error: invalid frame at line " << frame_count + 1
+                                << ": non-sequential frame index " << frames[frame_count].seq
+                                << " after " << frames[frame_count - 1].seq << std::endl;
+                    frames[frame_count].error = true;
+                }
+
+                if (frames[frame_count].timestamp_ms <= frames[frame_count - 1].timestamp_ms) {
+                    std::cerr << "error: invalid frame at line " << frame_count + 1
+                                << ": non-monotonic timestamp " << frames[frame_count].timestamp_ms
+                                << " after " << frames[frame_count - 1].timestamp_ms << std::endl;
+                    frames[frame_count].error = true;
+                }
+
+                if (frames[frame_count].voltage_v <= 0.0) {
+                    std::cerr << "error: invalid frame at line " << frame_count + 1
+                                << ": voltage must be positive, got " << frames[frame_count].voltage_v
+                                << std::endl;
+                    frames[frame_count].error = true;
+                }
+
+                if (frames[frame_count].temperature_c < TEMP_RANGE[0] ||
+                    frames[frame_count].temperature_c > TEMP_RANGE[1]) {
+                    std::cerr << "error: invalid frame at line " << frame_count + 1
+                                << ": temperature out of range [" << TEMP_RANGE[0] << ", "
+                                << TEMP_RANGE[1] << "], got " << frames[frame_count].temperature_c
+                                << std::endl;
+                    frames[frame_count].error = true;
+                }
+
+                if (frames[frame_count].gps_fix != 0 && frames[frame_count].gps_fix != 1) {
+                    std::cerr << "error: invalid frame at line " << frame_count + 1
+                                << ": gps_fix must be in range [0, 1], got " << frames[frame_count].gps_fix
+                                << std::endl;
+                    frames[frame_count].error = true;
+                }
+
+                if (frames[frame_count].satellites < 0) {
+                    std::cerr << "error: invalid frame at line " << frame_count + 1
+                                << ": satellites must be non-negative, got " << frames[frame_count].satellites
+                                << std::endl;
+                    frames[frame_count].error = true;
+                }
+            }
 
             if (frames[frame_count].error) {
                 return -1;
