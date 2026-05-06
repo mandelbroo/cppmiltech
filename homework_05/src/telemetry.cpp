@@ -64,12 +64,22 @@ double parse_double(const char* text) {
     return value;
 }
 
-Frame parse_frame(char line[]) {
+Frame parse_frame(char line[], int frame_index) {
     char* fields[EXPECTED_FIELD_COUNT] = {};
     const int field_count = split_line(line, fields, EXPECTED_FIELD_COUNT);
     (void)field_count;
 
     Frame frame{};
+
+    for (int i = 0; i < EXPECTED_FIELD_COUNT; ++i) {
+        if (fields[i] == nullptr) {
+            std::cerr << "error: missing field " << i + 1 << " in frame " << frame_index + 1 << '\n';
+            frame.error = true;
+
+            return frame;
+        }
+    }
+
     frame.timestamp_ms = parse_long(fields[0]);
     frame.seq = parse_int(fields[1]);
     frame.voltage_v = parse_double(fields[2]);
@@ -102,9 +112,19 @@ int read_frames(const char* path, Frame frames[], int max_frames) {
         }
 
         if (frame_count < max_frames) {
-            frames[frame_count] = parse_frame(line);
+            frames[frame_count] = parse_frame(line, frame_count);
+
+            if (frames[frame_count].error) {
+                return -1;
+            }
+
             ++frame_count;
         }
+    }
+
+    if (frame_count == 0) {
+        std::cerr << "error: zero telemetery frames provided in file: " << path << std::endl;
+        return -1;
     }
 
     return frame_count;
