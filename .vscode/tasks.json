@@ -32,6 +32,11 @@
         "panel": "dedicated",
         "clear": true
       }
+    },
+    {
+      "label": "CTest: run all test",
+      "type": "shell",
+      "command": "ctest --test-dir build/debug --output-on-failure"
     }
   ]
 }
