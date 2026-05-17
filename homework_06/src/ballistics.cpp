@@ -8,7 +8,7 @@ using namespace std;
 
 const float GRAVITY_ACCEL = 9.81f;
 
-float calcAmmoFallTime(const AmmoParams& ammo, const float& attackSpeed, const float& droneHeight) {
+float calcAmmoFallTime(const Ammo& ammo, const float& attackSpeed, const float& droneHeight) {
   /*
     V₀ — швидкість атаки дрона
     Z₀ — висота дрона (zd)
@@ -91,4 +91,41 @@ float calcDistance(const Coord& a, const Coord& b) {
   float distance = sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
 
   return distance;
+}
+
+Coord calcFireCoordinates(const float& horizontalDistance, const float& distanceToTarget, const float& xd, const float& yd, const float& targetX, const float& targetY) {
+  /*
+    ratio = (D − h) / D
+    fireX = xd + (targetX − xd) · ratio
+    fireY = yd + (targetY − yd) · ratio
+  */
+
+  float ratio = (distanceToTarget - horizontalDistance) / static_cast<double>(distanceToTarget);
+  float fireX = xd + (targetX - xd) * ratio;
+  float fireY = yd + (targetY - yd) * ratio;
+
+  return {fireX, fireY};
+}
+
+bool isManoeuvreNeeded(const float& horizontalDistance, const float& accelerationPath, const float& distanceToTarget) {
+  /*
+    Manoeuvre is needed if (accelerationPath + horizontalDistance) > distanceToTarget
+  */
+
+  return (accelerationPath + horizontalDistance) > distanceToTarget;
+}
+
+void processManouvre(DroneConfig& drone, const Coord& targetPosition) {
+  /*
+    xd' = targetX − (targetX − xd) · (h + accelerationPath) / D
+    yd' = targetY − (targetY − yd) · (h + accelerationPath) / D
+  */
+
+  float h = calcHorizontalDistance(calcAmmoFallTime(drone.ammo, drone.attackSpeed, drone.startPos.z), drone, targetPosition);
+  float distanceToTarget = calcDistance(drone.startPos, targetPosition);
+
+  if (isManoeuvreNeeded(h, drone.accelPath, distanceToTarget)) {
+    drone.startPos.x = targetPosition.x - (targetPosition.x - drone.startPos.x) * (h + drone.accelPath) / distanceToTarget;
+    drone.startPos.y = targetPosition.y - (targetPosition.y - drone.startPos.y) * (h + drone.accelPath) / distanceToTarget;
+  }
 }
