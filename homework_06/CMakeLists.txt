@@ -33,6 +33,9 @@ if(NOT CMAKE_CROSSCOMPILING)
 
   add_executable(ballistics_tests tests/ballistics_tests.cpp)
 
+  target_compile_definitions(ballistics_tests PRIVATE
+      TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/homework_06/data")
+
   target_link_libraries(ballistics_tests PRIVATE ballistics GTest::gtest_main)
 
   gtest_discover_tests(ballistics_tests DISCOVERY_MODE PRE_TEST)
