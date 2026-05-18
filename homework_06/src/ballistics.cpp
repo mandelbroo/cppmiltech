@@ -2,11 +2,23 @@
 #include "ballistics.hpp"
 
 #include <cmath>
+#include <cstring>
+#include <fstream>
+#include <iostream>
 #include <string>
 
 using namespace std;
 
 const float GRAVITY_ACCEL = 9.81f;
+const int AMMO_TYPES_COUNT = 5;
+
+const Ammo ARSENAL[AMMO_TYPES_COUNT] = {
+    {.name = "VOG-17", .mass = 0.35f, .drag = 0.07f, .lift = 0.0f},
+    {.name = "M67", .mass = 0.6f, .drag = 0.1f, .lift = 0.0f},
+    {.name = "RKG-3", .mass = 1.2f, .drag = 0.1f, .lift = 0.0f},
+    {.name = "GLIDING-VOG", .mass = 0.45f, .drag = 0.1f, .lift = 1.0f},
+    {.name = "GLIDING-RKG", .mass = 1.4f, .drag = 0.1f, .lift = 1.0f},
+};
 
 float calcAmmoFallTime(const Ammo& ammo, const float& attackSpeed, const float& droneHeight) {
   /*
@@ -128,4 +140,93 @@ void processManouvre(DroneConfig& drone, const Coord& targetPosition) {
     drone.startPos.x = targetPosition.x - (targetPosition.x - drone.startPos.x) * (h + drone.accelPath) / distanceToTarget;
     drone.startPos.y = targetPosition.y - (targetPosition.y - drone.startPos.y) * (h + drone.accelPath) / distanceToTarget;
   }
+}
+
+BallisticsInput parseInputFile(const string& filePath) {
+  ifstream inputFile(filePath);
+
+  if (!inputFile.is_open()) {
+    cerr << "Error: Could not open the file:" << filePath << endl;
+    exit(1);
+  }
+
+  BallisticsInput input;
+
+  inputFile >> input.droneX >> input.droneY >> input.droneZ >> input.targetX >> input.targetY >> input.attackSpeed >> input.accelerationPath >> input.ammoName;
+
+  inputFile.close();
+
+  return input;
+}
+
+DropSolution computeDropSolution(const BallisticsInput& input) {
+  DroneConfig drone = {{input.droneX, input.droneY, input.droneZ}, {}, input.attackSpeed, input.accelerationPath};
+
+  for (int i = 0; i < AMMO_TYPES_COUNT; i++) {
+    if (input.ammoName == ARSENAL[i].name) {
+      drone.ammo = ARSENAL[i];
+      break;
+    }
+  }
+
+  cout << "AMMO TYPE: " << drone.ammo.name << endl;
+
+  float fallTime = calcAmmoFallTime(drone.ammo, drone.attackSpeed, drone.startPos.z);
+
+  cout << "Fall time: " << fallTime << "s" << endl;
+
+  Coord targetPosition = {input.targetX, input.targetY, 0.};
+
+  float horizontalDistance = calcHorizontalDistance(fallTime, drone, targetPosition);
+
+  cout << "Horizontal distance: " << horizontalDistance << "m" << endl;
+
+  float distanceToTarget = calcDistance(drone.startPos, targetPosition);
+
+  cout << "Distance to target: " << distanceToTarget << "m" << endl;
+
+  DropSolution dropSolution{};
+
+  if (isManoeuvreNeeded(horizontalDistance, drone.accelPath, distanceToTarget)) {
+    cout << endl
+         << "Manoeuvre is needed!" << endl;
+
+    dropSolution.isManoeuvrePerformed = true;
+    dropSolution.manouvreX = drone.startPos.x;
+    dropSolution.manouvreY = drone.startPos.y;
+
+    processManouvre(drone, targetPosition);
+    horizontalDistance = calcHorizontalDistance(calcAmmoFallTime(drone.ammo, drone.attackSpeed, drone.startPos.z), drone, targetPosition);
+    distanceToTarget = calcDistance(drone.startPos, targetPosition);
+
+    cout << "Drone moves to new x: " << drone.startPos.x << " y: " << drone.startPos.y << endl
+         << endl;
+  }
+
+  Coord fireCoordinates = calcFireCoordinates(horizontalDistance, distanceToTarget, drone.startPos.x, drone.startPos.y, targetPosition.x, targetPosition.y);
+
+  cout << endl
+       << "Fire x: " << fireCoordinates.x << " y: " << fireCoordinates.y << endl;
+
+  dropSolution.fireX = fireCoordinates.x;
+  dropSolution.fireY = fireCoordinates.y;
+
+  return dropSolution;
+}
+
+void writeOutputFile(const string& filePath, const DropSolution& dropSolution) {
+  ofstream outputFile(filePath);
+
+  if (!outputFile.is_open()) {
+    cerr << "Error: Could not open the file for writing:" << filePath << endl;
+    exit(1);
+  }
+
+  if (dropSolution.isManoeuvrePerformed) {
+    outputFile << dropSolution.manouvreX << " " << dropSolution.manouvreY << " ";
+  }
+
+  outputFile << dropSolution.fireX << " " << dropSolution.fireY;
+
+  outputFile.close();
 }

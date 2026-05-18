@@ -16,16 +16,33 @@ struct Ammo {
 struct DroneConfig {
   Coord startPos;  // початкова позиція (x, y)
   Ammo ammo;
-  float altitude;     // висота
-  float initialDir;   // початковий напрямок (рад)
-  float attackSpeed;  // швидкість атаки (м/с)
-  float accelPath;    // шлях розгону (м)
-  // char ammoName[32];    // обрані боєприпаси
+  float altitude;       // висота
+  float initialDir;     // початковий напрямок (рад)
+  float attackSpeed;    // швидкість атаки (м/с)
+  float accelPath;      // шлях розгону (м)
   float arrayTimeStep;  // крок часу масиву цілей
   float simTimeStep;    // крок симуляції
   float hitRadius;      // радіус влучення
   float angularSpeed;   // кутова швидкість (рад/с)
   float turnThreshold;  // поріг повороту (рад)
+};
+
+struct BallisticsInput {
+  float droneX;
+  float droneY;
+  float droneZ;
+  float targetX;
+  float targetY;
+  float attackSpeed;
+  float accelerationPath;
+  std::string ammoName;
+};
+struct DropSolution {
+  float fireX;
+  float fireY;
+  bool isManoeuvrePerformed = false;
+  float manouvreX;
+  float manouvreY;
 };
 
 float calcAmmoFallTime(const Ammo& ammo, const float& attackSpeed, const float& droneHeight);
@@ -34,3 +51,6 @@ Coord calcFireCoordinates(const float& horizontalDistance, const float& distance
 float calcHorizontalDistance(const float& fallTime, DroneConfig& drone, const Coord& targetPosition);
 bool isManoeuvreNeeded(const float& horizontalDistance, const float& accelerationPath, const float& distanceToTarget);
 void processManouvre(DroneConfig& drone, const Coord& targetPosition);
+BallisticsInput parseInputFile(const std::string& filePath);
+DropSolution computeDropSolution(const BallisticsInput& input);
+void writeOutputFile(const std::string& filePath, const DropSolution& dropSolution);
