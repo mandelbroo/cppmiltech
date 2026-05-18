@@ -29,7 +29,7 @@
       ]
     },
     {
-      // Локальний debug стартера ДЗ 4. preLaunchTask збирає debug preset.
+      // debug ДЗ 4. preLaunchTask збирає debug preset.
       "name": "Debug homework_04: ugv_odometry",
       "type": "cppdbg",
       "request": "launch",
@@ -53,7 +53,7 @@
       ]
     },
     {
-      // Локальний debug стартера ДЗ 6. preLaunchTask збирає debug preset.
+      // debug ДЗ 6. preLaunchTask збирає debug preset.
       "name": "Debug homework_06: ballistics",
       "type": "cppdbg",
       "request": "launch",
@@ -77,9 +77,10 @@
       ]
     },
     {
+      // debug тестів ДЗ 6. preLaunchTask збирає debug preset.
       "type": "cppdbg",
       "request": "launch",
-      "name": "Debug homework_06/ballistics_tests",
+      "name": "Debug homework_06: ballistics_tests",
       "program": "${workspaceFolder}/build/debug/homework_06/ballistics_tests",
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
@@ -92,7 +93,7 @@
         {
           "description": "Увімкнути pretty-printing для STL типів у GDB.",
           "text": "-enable-pretty-printing",
-          "ignoreFailures": true
+          "ignoreFailures": false
         }
       ]
     }
