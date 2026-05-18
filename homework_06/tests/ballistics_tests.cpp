@@ -5,10 +5,7 @@
 #include "ballistics.hpp"
 
 const Ammo TEST_AMMO = {
-    .name = "VOG-17",
-    .mass = 0.35f,
-    .drag = 0.07f,
-    .lift = 0.0f};
+    .name = "VOG-17", .mass = 0.35f, .drag = 0.07f, .lift = 0.0f};
 
 TEST(BallisticsTests, TestComputesKnownDropPoint) {
   BallisticsInput input = parseInputFile(TEST_DATA_DIR "/sample_vog17.txt");
@@ -37,18 +34,19 @@ TEST(BallisticsTests, TestCalcFallTime) {
 }
 
 TEST(BallisticsTests, TestCalcHorizontalDistance) {
-  DroneConfig drone = {
-      .startPos = {10.0f, 10.0f, 100.0f},
-      .ammo = TEST_AMMO,
-      .attackSpeed = 50.0f};
+  DroneConfig drone = {.startPos = {10.0f, 10.0f, 100.0f},
+                       .ammo = TEST_AMMO,
+                       .attackSpeed = 50.0f};
 
   drone.attackSpeed = 50.0f;
 
-  float fallTime = calcAmmoFallTime(drone.ammo, drone.attackSpeed, drone.startPos.z);
+  float fallTime =
+      calcAmmoFallTime(drone.ammo, drone.attackSpeed, drone.startPos.z);
 
   Coord targetPosition = {100.0f, 100.0f, 0.};
 
-  float horizontalDistance = calcHorizontalDistance(fallTime, drone, targetPosition);
+  float horizontalDistance =
+      calcHorizontalDistance(fallTime, drone, targetPosition);
 
   EXPECT_NEAR(horizontalDistance, 185.5f, 0.06f);
 }
@@ -70,7 +68,8 @@ TEST(BallisticsTests, TestCalcFireCoordinates) {
   float targetX = 100.0f;
   float targetY = 0.0f;
 
-  Coord fireCoords = calcFireCoordinates(horizontalDistance, distanceToTarget, xd, yd, targetX, targetY);
+  Coord fireCoords = calcFireCoordinates(horizontalDistance, distanceToTarget,
+                                         xd, yd, targetX, targetY);
 
   EXPECT_NEAR(fireCoords.x, 12.1f, 0.1f);
   EXPECT_NEAR(fireCoords.y, 9.7f, 0.1f);
