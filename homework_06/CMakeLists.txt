@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(telemetry_check  CXX)
+project(telemetry_check CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,21 +20,17 @@ if(NOT CMAKE_CROSSCOMPILING)
   include(GoogleTest)
 
   FetchContent_Declare(
-
-      googletest
-
-      URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-
-      DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-
-  )
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
 
   FetchContent_MakeAvailable(googletest)
 
   add_executable(ballistics_tests tests/ballistics_tests.cpp)
 
-  target_compile_definitions(ballistics_tests PRIVATE
-      TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/homework_06/data")
+  target_compile_definitions(
+    ballistics_tests
+    PRIVATE TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/homework_06/data")
 
   target_link_libraries(ballistics_tests PRIVATE ballistics GTest::gtest_main)
 
