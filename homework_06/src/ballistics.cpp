@@ -32,13 +32,13 @@ float calcAmmoFallTime(const Ammo &ammo, const float &attackSpeed,
     c = 6m²·Z₀
   */
 
-  float drag² = ammo.drag * ammo.drag;
-  float mass² = ammo.mass * ammo.mass;
+  float drag2 = ammo.drag * ammo.drag;
+  float mass2 = ammo.mass * ammo.mass;
   float a = ammo.drag * GRAVITY_ACCEL * ammo.mass -
-            2.0f * drag² * ammo.lift * attackSpeed;
-  float b = -3.0f * GRAVITY_ACCEL * mass² +
+            2.0f * drag2 * ammo.lift * attackSpeed;
+  float b = -3.0f * GRAVITY_ACCEL * mass2 +
             3.0f * ammo.drag * ammo.lift * ammo.mass * attackSpeed;
-  float c = 6.0f * mass² * droneHeight;
+  float c = 6.0f * mass2 * droneHeight;
 
   /*
     p = − b² / (3a²)
@@ -47,14 +47,14 @@ float calcAmmoFallTime(const Ammo &ammo, const float &attackSpeed,
     t = 2√(−p/3) · cos( (φ + 4π) / 3 ) − b / (3a)
   */
 
-  float a² = a * a;
-  float a³ = a² * a;
-  float b² = b * b;
-  float b³ = b² * b;
+  float a2 = a * a;
+  float a3 = a2 * a;
+  float b2 = b * b;
+  float b3 = b2 * b;
 
-  float p = -b² / static_cast<double>(3.0 * a²);
+  float p = -b2 / static_cast<double>(3.0 * a2);
   float q =
-      2.0 * b³ / static_cast<double>(27.0 * a³) + c / static_cast<double>(a);
+      2.0 * b3 / static_cast<double>(27.0 * a3) + c / static_cast<double>(a);
   float phi = acos(3.0 * q / static_cast<double>(2.0 * p) *
                    sqrt(-3.0 / static_cast<double>(p)));
   float t = 2.0 * sqrt(-p / 3.0) * cos((phi + 4.0 * M_PI) / 3.0) -
@@ -76,35 +76,35 @@ float calcHorizontalDistance(const float &fallTime, DroneConfig &drone,
   float mass = drone.ammo.mass;
   float attackSpeed = drone.attackSpeed;
 
-  float t² = t * t;
-  float t³ = t² * t;
-  float t⁴ = t³ * t;
-  float t⁵ = t⁴ * t;
-  float drag² = drag * drag;
-  float drag³ = drag² * drag;
-  float drag⁴ = drag³ * drag;
-  float lift² = lift * lift;
-  float lift³ = lift² * lift;
-  float lift⁴ = lift³ * lift;
-  float mass² = mass * mass;
-  float mass³ = mass² * mass;
-  float mass⁴ = mass³ * mass;
+  float t2 = t * t;
+  float t3 = t2 * t;
+  float t4 = t3 * t;
+  float t5 = t4 * t;
+  float drag2 = drag * drag;
+  float drag3 = drag2 * drag;
+  float drag4 = drag3 * drag;
+  float lift2 = lift * lift;
+  float lift3 = lift2 * lift;
+  float lift4 = lift3 * lift;
+  float mass2 = mass * mass;
+  float mass3 = mass2 * mass;
+  float mass4 = mass3 * mass;
 
   float h =
-      attackSpeed * t - t² * drag * attackSpeed / (2.0 * mass) +
-      t³ *
+      attackSpeed * t - t2 * drag * attackSpeed / (2.0 * mass) +
+      t3 *
           (6.0 * drag * GRAVITY_ACCEL * lift * mass -
-           6.0 * drag² * (lift² - 1.0) * attackSpeed) /
-          (36.0 * mass²) +
-      t⁴ *
-          (-6.0 * drag² * GRAVITY_ACCEL * lift * (1.0 + lift² + lift⁴) * mass +
-           3.0 * drag³ * lift² * (1.0 + lift²) * attackSpeed +
-           6.0 * drag³ * lift⁴ * (1.0 + lift²) * attackSpeed) /
-          (36.0 * pow(1.0 + lift², 2) * mass³) +
-      t⁵ *
-          (3.0 * drag³ * GRAVITY_ACCEL * lift³ * mass -
-           3.0 * drag⁴ * lift² * (1.0 + lift²) * attackSpeed) /
-          (36.0 * (1.0 + lift²) * mass⁴);
+           6.0 * drag2 * (lift2 - 1.0) * attackSpeed) /
+          (36.0 * mass2) +
+      t4 *
+          (-6.0 * drag2 * GRAVITY_ACCEL * lift * (1.0 + lift2 + lift4) * mass +
+           3.0 * drag3 * lift2 * (1.0 + lift2) * attackSpeed +
+           6.0 * drag3 * lift4 * (1.0 + lift2) * attackSpeed) /
+          (36.0 * pow(1.0 + lift2, 2) * mass3) +
+      t5 *
+          (3.0 * drag3 * GRAVITY_ACCEL * lift3 * mass -
+           3.0 * drag4 * lift2 * (1.0 + lift2) * attackSpeed) /
+          (36.0 * (1.0 + lift2) * mass4);
 
   // CHECK IF DRONE IS PRECISELY OVER THE TARGET SO DISTANCE IS NOT ZERO ------
   if (targetPosition.x == drone.startPos.x &&
