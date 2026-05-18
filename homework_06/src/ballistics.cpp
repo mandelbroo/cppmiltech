@@ -160,7 +160,12 @@ BallisticsInput parseInputFile(const string& filePath) {
 }
 
 DropSolution computeDropSolution(const BallisticsInput& input) {
-  DroneConfig drone = {{input.droneX, input.droneY, input.droneZ}, {}, input.attackSpeed, input.accelerationPath};
+  DroneConfig drone = {
+      .startPos = {.x = input.droneX,
+                   .y = input.droneY,
+                   .z = input.droneZ},
+      .attackSpeed = input.attackSpeed,
+      .accelPath = input.accelerationPath};
 
   for (int i = 0; i < AMMO_TYPES_COUNT; i++) {
     if (input.ammoName == ARSENAL[i].name) {
@@ -169,13 +174,17 @@ DropSolution computeDropSolution(const BallisticsInput& input) {
     }
   }
 
+  if (drone.ammo.name == "Unknown") {
+    return {.errorMessage = "Unknown ammo type: " + input.ammoName};
+  }
+
   cout << "AMMO TYPE: " << drone.ammo.name << endl;
 
   float fallTime = calcAmmoFallTime(drone.ammo, drone.attackSpeed, drone.startPos.z);
 
   cout << "Fall time: " << fallTime << "s" << endl;
 
-  Coord targetPosition = {input.targetX, input.targetY, 0.};
+  Coord targetPosition = {input.targetX, input.targetY};
 
   float horizontalDistance = calcHorizontalDistance(fallTime, drone, targetPosition);
 

@@ -19,6 +19,14 @@ TEST(BallisticsTests, TestComputesKnownDropPoint) {
   EXPECT_NEAR(solution.fireY, 173.759, 0.01);
 }
 
+TEST(BallisticsTests, TestComputesUnknownAmmo) {
+  BallisticsInput input = parseInputFile(TEST_DATA_DIR "/unknown_ammo.txt");
+
+  const DropSolution solution = computeDropSolution(input);
+
+  EXPECT_EQ(solution.errorMessage, "Unknown ammo type: F1");
+}
+
 TEST(BallisticsTests, TestCalcFallTime) {
   float attackSpeed = 50.0f;
   float droneHeight = 100.0f;

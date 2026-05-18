@@ -43,6 +43,7 @@ struct DropSolution {
   bool isManoeuvrePerformed = false;
   float manouvreX;
   float manouvreY;
+  std::string errorMessage;
 };
 
 float calcAmmoFallTime(const Ammo& ammo, const float& attackSpeed, const float& droneHeight);

@@ -15,6 +15,11 @@ int main(int argc, char** argv) {
   BallisticsInput input = parseInputFile(INPUT_FILE);
 
   DropSolution dropSolution = computeDropSolution(input);
+  
+  if (!dropSolution.errorMessage.empty()) {
+    cerr << "Error: " << dropSolution.errorMessage << endl;
+    return 1;
+  }
 
   writeOutputFile("output.txt", dropSolution);
 }
